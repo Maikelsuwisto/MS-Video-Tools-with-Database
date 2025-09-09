@@ -1,9 +1,13 @@
 fastapi
-uvicorn[standard]
+uvicorn
 python-multipart
-faster-whisper
 pydub
-ffmpeg-python
 webrtcvad
-soundfile
-numpy
+faster-whisper
+psycopg2-binary         # PostgreSQL driver
+sqlalchemy              # ORM
+python-dotenv           # load env vars
+passlib[bcrypt]         # password hashing
+bcrypt                  # low-level password hashing
+python-jose[cryptography]  # JWT auth
+pydantic                # request/response validation

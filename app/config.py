@@ -1,0 +1,8 @@
+import os
+
+# Railway provides DATABASE_URL directly
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:wnjQUAGFTDbmvCDHEUkJtUGfuCYbTTxU@postgres.railway.internal:5432/railway")
+
+JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_EXP_MINUTES = int(os.getenv("JWT_EXP_MINUTES", 60))
