@@ -2,7 +2,9 @@ import os, traceback
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from .routes import users, transcribe
+import os
 
 app = FastAPI(title="MS-Video Backend")
 
@@ -12,6 +14,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+build_path = "build"
+if not os.path.exists(build_path):
+    raise RuntimeError(f"React build folder not found at '{build_path}'")
+
+app.mount("/assets", StaticFiles(directory=os.path.join(build_path, "assets")), name="assets")
 
 @app.middleware("http")
 async def add_coop_coep_headers(request, call_next):
