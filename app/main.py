@@ -1,7 +1,7 @@
 import os, traceback
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from .routes import users, transcribe
 
 app = FastAPI(title="MS-Video Backend")
@@ -24,7 +24,9 @@ async def add_coop_coep_headers(request, call_next):
 def health(): return {"message": "API is running ✅"}
 
 @app.get("/")
-def root(): return {"message": "Backend running ✅"}
+async def serve_index():
+    return FileResponse(os.path.join(build_path, "index.html"))
+
 
 # Register routes
 app.include_router(users.router)
