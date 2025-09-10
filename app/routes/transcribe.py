@@ -2,7 +2,7 @@ import os, uuid, shutil
 from fastapi import APIRouter, UploadFile, File, Form, Depends
 from fastapi.responses import FileResponse
 from ..utils.security import get_current_user
-from ..utils.whisper_utils import get_model, seconds_to_hms, split_segment_text_precise, format_srt_time
+from ..utils.whisper_utils import get_model, seconds_to_hms, split_segment_text_precise, format_srt_time, split_srt_segments
 from ..utils.vad_utils import detect_first_speech
 
 router = APIRouter()
@@ -57,25 +57,28 @@ def transcribe_text(
         if os.path.exists(save_path):
             os.remove(save_path)
 
-def generate_srt(segments, first_speech_time: float = 0.0, max_chars_per_line: int = 40):
-    lines, first_adjusted = [], False
+def generate_srt(segments, first_speech_time: float = 0.0):
+    srt_lines, first_adjusted = [], False
+    counter = 1
+
     for seg in segments:
         start, end = seg.start, seg.end
         if not first_adjusted and first_speech_time > 0:
             start = first_speech_time
             first_adjusted = True
-        lines.append(f"{format_srt_time(start)} --> {format_srt_time(end)}")
-        words, current_line, wrapped = seg.text.strip().split(), "", []
-        for word in words:
-            if len(current_line) + len(word) + 1 <= max_chars_per_line:
-                current_line += (" " if current_line else "") + word
-            else:
-                wrapped.append(current_line)
-                current_line = word
-        if current_line: wrapped.append(current_line)
-        if len(wrapped) > 2: wrapped = [wrapped[0], " ".join(wrapped[1:])]
-        lines.extend(wrapped); lines.append("")
-    return "\n".join(lines)
+
+        # Split each segment into valid SRT chunks
+        chunks = split_srt_segments(seg.text, start, end)
+
+        for chunk in chunks:
+            srt_lines.append(str(counter))
+            srt_lines.append(f"{format_srt_time(chunk['start'])} --> {format_srt_time(chunk['end'])}")
+            srt_lines.append(chunk['text'])
+            srt_lines.append("")
+            counter += 1
+
+    return "\n".join(srt_lines)
+
 
 @router.post("/transcribe_srt")
 def transcribe_to_srt(video: UploadFile = File(...), current_user: str = Depends(get_current_user)):
