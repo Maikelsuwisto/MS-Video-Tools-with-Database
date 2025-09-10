@@ -1,7 +1,8 @@
 import os
 
 # Railway provides DATABASE_URL directly
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:wnjQUAGFTDbmvCDHEUkJtUGfuCYbTTxU@postgres.railway.internal:5432/railway")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:wnjQUAGFTDbmvCDHEUkJtUGfuCYbTTxU@shinkansen.proxy.rlwy.net:18315/railway")
+
 
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
